@@ -1,75 +1,56 @@
-# React + TypeScript + Vite
+# Rímac — Seguro Salud Flexible
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web de cotización de seguros de salud. Permite ingresar datos, comparar planes y consultar un resumen de la cotización, con diseño adaptable a desktop y mobile.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js compatible con Vite 8
+- npm
 
-## React Compiler
+## Inicio rápido
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Vite muestra en la terminal la dirección local de la aplicación.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Comandos
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Inicia el servidor de desarrollo. |
+| `npm run build` | Ejecuta el chequeo de TypeScript y genera la versión de producción en `dist/`. |
+| `npm run preview` | Sirve localmente la versión generada. |
+| `npm run lint` | Ejecuta ESLint. |
 
+## Flujo de cotización
+
+1. **Inicio:** se validan el documento, el celular y los consentimientos.
+2. **Planes:** se obtienen primero los datos del usuario y, al completar esa solicitud, los planes. Se muestran únicamente los planes compatibles con la edad y después de elegir para quién se cotiza.
+3. **Resumen:** muestra los datos del usuario, el plan elegido y su precio. Cotizar para otra persona aplica un descuento del 5 %.
+
+Al comenzar una cotización nueva se limpian las selecciones anteriores. Al volver del resumen a los planes, se conserva la modalidad y se desmarca el plan.
+
+## Estructura
+
+```text
+src/
+├── adapters/     Normalización de datos externos
+├── api/          Solicitudes al servicio de cotización
+├── components/   Header, selector de documento y botones compartidos
+├── domain/       Validaciones y reglas de precio
+├── store/        Estado persistido del flujo
+├── styles/       Tokens globales de diseño
+└── views/        Pantallas de planes y resumen
 ```
+
+## Servicio de datos
+
+La aplicación consume el servicio público:
+
+- `GET https://rimac-front-end-challenge.netlify.app/api/user.json`
+- `GET https://rimac-front-end-challenge.netlify.app/api/plans.json`
+
+TanStack Query gestiona las solicitudes y su caché. El estado del flujo se conserva con Zustand en `localStorage`.
