@@ -294,7 +294,7 @@
   grid-template-columns: 150px minmax(0, 1fr);
   border: 1px solid var(--color-neutral-border);
   border-radius: var(--radius-input);
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
 }
 
@@ -589,9 +589,67 @@
   box-sizing: border-box;
 }
 
-.documentSelect select {
-  appearance: none;
-  padding-right: 44px;
+.documentTypeTrigger {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  padding: 0 44px 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--color-navy-primary);
+  font: 700 16px/24px var(--font-flow);
+  text-align: left;
+  cursor: pointer;
+}
+
+.documentTypeTrigger:focus-visible {
+  outline: 2px solid var(--color-step-active);
+  outline-offset: -3px;
+}
+
+.documentSelect.isOpen {
+  z-index: 10;
+}
+
+.documentOptions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% - 1px);
+  left: -1px;
+  width: calc(100% + 2px);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-card-border);
+  border-radius: 0 0 var(--radius-input) var(--radius-input);
+  background: var(--color-white);
+  box-shadow: 0 8px 20px rgba(20, 25, 56, 0.14);
+  list-style: none;
+}
+
+.documentOption {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--color-white);
+  color: var(--color-navy-primary);
+  font: 400 16px/24px var(--font-flow);
+  text-align: left;
+  cursor: pointer;
+}
+
+.documentOption[aria-selected="true"],
+.documentOption:hover,
+.documentOption:focus-visible {
+  background: var(--color-step-bar-bg);
+}
+
+.documentOption:focus-visible {
+  outline: 2px solid var(--color-step-active);
+  outline-offset: -2px;
 }
 
 .selectChevron {

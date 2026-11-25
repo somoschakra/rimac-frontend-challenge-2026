@@ -4,6 +4,7 @@ import { useQuoteStore } from './store/quoteStore'
 import { documentValidators } from './domain/validation'
 import hero from './assets/hero.webp'
 import Header from './components/Header'
+import DocumentTypeSelect from './components/DocumentTypeSelect'
 import './styles/tokens.css'
 import './App.css'
 
@@ -25,10 +26,7 @@ function Home(): React.ReactNode {
         <div className="fieldGroup documentGroup">
           <label className="fieldHeading" htmlFor="documentNumber">Documento</label>
           <div className="documentRow">
-            <label className="documentSelect">
-              <select value={state.documentType} aria-label="Tipo de documento" onChange={(e) => state.setDocumentType(e.target.value as typeof state.documentType)}><option>DNI</option><option>RUC</option><option>CE</option><option>Pasaporte</option></select>
-              <svg className="selectChevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8.5 7 7 7-7" /></svg>
-            </label>
+            <DocumentTypeSelect value={state.documentType} onChange={state.setDocumentType} />
             <label className="floating"><input id="documentNumber" value={state.documentNumber} inputMode="numeric" onChange={(e) => state.setDocumentNumber(e.target.value)} /></label>
           </div>
         </div>
