@@ -37,7 +37,7 @@ function Home(): React.ReactNode {
         {phoneError && <p className="error" role="alert">{phoneError}</p>}
         <div className="check"><input id="privacyPolicy" name="policy" type="checkbox" checked={state.privacy} onChange={(e) => state.setPrivacy(e.target.checked)} /><label htmlFor="privacyPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política de Privacidad</span></label></div>
         <div className="check"><input id="commercialPolicy" name="commercialPolicy" type="checkbox" checked={state.commercial} onChange={(e) => state.setCommercial(e.target.checked)} /><label htmlFor="commercialPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política Comunicaciones Comerciales</span></label></div>
-        <a className="terms" href="#">Aplican Términos y Condiciones.</a><button className="primary" type="submit">Cotiza aquí</button>
+        <a className="terms" href="#"><b>Aplican Términos y Condiciones.</b></a><button className="primary" type="submit">Cotiza aquí</button>
       </form>
     </section>
     {/* <footer className="footer"><img src={logo} width="73" height="36" alt="Rimac" /><hr /><span>© 2023 RIMAC Seguros y Reaseguros.</span></footer> */}

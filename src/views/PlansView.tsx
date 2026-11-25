@@ -9,9 +9,32 @@ import hospitalIcon from '../assets/icons/IcHospitalLight.png'
 import Header from '../components/Header'
 import BackButton from '../components/BackButton'
 
+function BenefitIcon({ index }: { index: number }): React.ReactNode {
+  if (index % 3 === 1) {
+    return <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3" width="15" height="11" rx="1.5" /><path d="M6 17h8m-4-3v3" /></svg>
+  }
+  if (index % 3 === 2) {
+    return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 17V4h12v13M2.5 17h15M8 7h4m-2-2v4M7 17v-4h6v4" /></svg>
+  }
+  return <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.5" r="2.5" /><path d="M4 17v-1.5a6 6 0 0 1 12 0V17M2 9h4m-2-2v4" /></svg>
+}
+
 const PlanCard = memo(function PlanCard({ plan, selected, onSelect }: { plan: { name: string; price: number; description: string[] }; selected: boolean; onSelect: () => void }) {
   const icon = plan.name.includes('Clínica') ? hospitalIcon : protectionIcon
-  return <article className="planCard"><span className="recommended">Plan recomendado</span><div className="planTitleRow"><h3>{plan.name}</h3><img src={icon} width="48" height="48" alt="" /></div><span className="planCost">COSTO DEL PLAN</span><strong>$ {plan.price} al mes</strong><hr /><ul>{plan.description.map((item) => <li key={item}>{item}</li>)}</ul><button type="button" className={selected ? 'planSelected' : 'planSelect'} onClick={onSelect} aria-pressed={selected}>{selected ? 'Seleccionado' : 'Seleccionar plan'}</button></article>
+  return <article className="planCard">
+    <span className="recommended">Plan recomendado</span>
+    <div className="planTitleRow"><h3><b>{plan.name}</b></h3><img src={icon} width="48" height="48" alt="" /></div>
+    <span className="planCost">COSTO DEL PLAN</span>
+    <b className="planPrice">$ {plan.price} al mes</b>
+    <hr />
+    <ul>{plan.description.map((item, index) => <li key={item}>
+      <span className="benefitIcon"><BenefitIcon index={index} /></span>
+      <span>{item}</span>
+    </li>)}</ul>
+    <button type="button" className={selected ? 'planSelected' : 'planSelect'} onClick={onSelect} aria-pressed={selected}>
+      {selected ? 'Seleccionado' : 'Seleccionar plan'}
+    </button>
+  </article>
 })
 
 export default function PlansView(): React.ReactNode {
@@ -31,11 +54,11 @@ export default function PlansView(): React.ReactNode {
   return <main className="flowPage">
     <Header onHome={() => state.setView('home')} />
     <nav className="stepper" aria-label="Progreso">
-      <button className="mobileBack" type="button" onClick={() => state.setView('home')} aria-label="Volver">‹</button>
+      <BackButton variant="mobile" onClick={() => state.setView('home')} />
       <span className="mobileStepLabel">PASO 1 DE 2</span>
       <div className="mobileProgressBar" aria-hidden="true"><span /></div>
       <div className="stepProgress">
-        <span className="active"><b>1</b> PLANES Y COBERTURAS</span><i /><span><b>2</b> RESUMEN</span>
+        <span className="active"><b>1</b> Planes y coberturas</span><i /><span><b>2</b> Resumen</span>
       </div>
     </nav>
     <section className="plansSection">
@@ -72,9 +95,13 @@ export default function PlansView(): React.ReactNode {
           })}
         </div>
         {shown.length > 0 && <nav className="planPager" aria-label="Carrusel de planes">
-          <button type="button" aria-label="Plan anterior" onClick={() => setCardIndex((cardIndex - 1 + shown.length) % shown.length)}>‹</button>
+          <button type="button" aria-label="Plan anterior" onClick={() => setCardIndex((cardIndex - 1 + shown.length) % shown.length)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" /><path d="m12.971 15.904-3.907-3.904 3.907-3.904 1.058 1.058-2.843 2.846 2.843 2.846-1.058 1.058Z" /></svg>
+          </button>
           <span>{shown.length ? cardIndex + 1 : 0} / {shown.length}</span>
-          <button className="next" type="button" aria-label="Plan siguiente" onClick={() => setCardIndex((cardIndex + 1) % shown.length)}>›</button>
+          <button className="next" type="button" aria-label="Plan siguiente" onClick={() => setCardIndex((cardIndex + 1) % shown.length)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" /><path d="m12.971 15.904-3.907-3.904 3.907-3.904 1.058 1.058-2.843 2.846 2.843 2.846-1.058 1.058Z" /></svg>
+          </button>
         </nav>}
       </div>
     </section>

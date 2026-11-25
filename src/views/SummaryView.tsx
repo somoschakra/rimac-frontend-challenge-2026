@@ -18,7 +18,7 @@ export default function SummaryView(): React.ReactNode {
   return <main className="flowPage summaryPage">
     <Header onHome={() => state.setView('home')} />
     <nav className="stepper summaryStepper" aria-label="Progreso">
-      <button className="mobileBack" type="button" onClick={state.returnToPlans} aria-label="Volver">&#8249;</button>
+      <BackButton variant="mobile" onClick={state.returnToPlans} />
       <span className="mobileStepLabel">PASO 2 DE 2</span>
       <div className="mobileProgressBar complete" aria-hidden="true"><span /></div>
       <div className="stepProgress">
