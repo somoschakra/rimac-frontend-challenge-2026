@@ -1,5 +1,9 @@
 # Rímac — Seguro Salud Flexible
 
+<p align="center">
+  <img src="./src/assets/logo.png" alt="Rímac" width="146" />
+</p>
+
 Aplicación web de cotización de seguros de salud. Permite ingresar datos, comparar planes y consultar un resumen de la cotización, con diseño adaptable a desktop y mobile.
 
 ## Requisitos
