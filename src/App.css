@@ -577,3 +577,127 @@
     line-height: 20px;
   }
 }
+
+.badge {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.documentSelect {
+  position: relative;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.documentSelect select {
+  appearance: none;
+  padding-right: 44px;
+}
+
+.selectChevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--color-ink-primary);
+  stroke-width: 3;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  pointer-events: none;
+}
+
+.backButton {
+  gap: 8px;
+  font: 700 18px/20px var(--font-flow);
+  letter-spacing: 0.4px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.backButton svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+@media (max-width: 767px) {
+  .badge {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .summaryPage {
+    background: var(--color-page-bg);
+  }
+
+  .summaryPage .summaryStepper {
+    display: none;
+  }
+
+  .summaryPage .summarySection {
+    padding-top: 40px;
+  }
+
+  .plansSection > .backButton,
+  .summarySection > .backButton {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .summarySection h1 {
+    margin-bottom: 24px;
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .summaryCard {
+    width: 100%;
+    min-height: 0;
+    padding: 24px 32px;
+    box-sizing: border-box;
+  }
+
+  .summaryCard h2 {
+    margin-bottom: 12px;
+    font-size: 10px;
+    line-height: 16px;
+  }
+
+  .summaryPerson {
+    height: 40px;
+  }
+
+  .summaryPerson img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .summaryPerson strong {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .summaryCard > hr {
+    margin: 8px 0 16px;
+  }
+
+  .summaryData {
+    margin-bottom: 32px;
+  }
+
+  .summaryData h3 {
+    margin-bottom: 12px;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .summaryData p {
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
