@@ -1,0 +1,25 @@
+:root {
+  --font-home: 'Plus Jakarta Sans', sans-serif;
+  --font-flow: 'Lato', sans-serif;
+  --color-ink-primary: #03050F;
+  --color-navy-primary: #141938;
+  --color-slate-muted: #7981B2;
+  --color-neutral-border: #5E6488;
+  --color-card-border: #CCD1EE;
+  --color-brand-red: #FF1C44;
+  --color-brand-red-hover: #E01237;
+  --color-step-active: #4F4FFF;
+  --color-step-bar-bg: #EDEFFC;
+  --color-page-bg: #FAFBFF;
+  --color-white: #FFFFFF;
+  --color-badge-gradient: linear-gradient(86.01deg, #00F4E2 0%, #00FF7F 100%);
+  --color-badge-recommended: #7DF0BA;
+  --color-check-active: #389E0D;
+  --color-error: #FF1C44;
+  --shadow-card: 0px 1px 32px 0px rgba(174, 172, 243, 0.35);
+  --radius-card: 24px;
+  --radius-hero-img: 24px;
+  --radius-input: 8px;
+  --radius-pill: 40px;
+  --radius-tag: 4px;
+}
