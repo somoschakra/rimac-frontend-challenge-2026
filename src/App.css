@@ -759,3 +759,134 @@
     line-height: 20px;
   }
 }
+
+.errorNotice {
+  max-width: 520px;
+  margin: 24px auto;
+  padding: 28px 24px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+  color: var(--color-navy-primary);
+  font-family: var(--font-flow);
+  text-align: center;
+}
+
+.errorNoticeIcon {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #FFF0F2;
+  color: var(--color-brand-red);
+}
+
+.errorNoticeIcon svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.errorNotice h1,
+.errorNotice h2 {
+  margin: 16px 0 8px;
+  color: var(--color-navy-primary);
+  font: 700 22px/28px var(--font-flow);
+}
+
+.errorNotice p {
+  margin: 0 0 20px;
+  color: var(--color-slate-muted);
+  font: 400 15px/22px var(--font-flow);
+}
+
+.errorNoticeActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.errorNoticeButton,
+.errorNoticeSecondary {
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: 700 15px/20px var(--font-flow);
+  cursor: pointer;
+}
+
+.errorNoticeButton {
+  background: var(--color-brand-red);
+  color: var(--color-white);
+}
+
+.errorNoticeButton:hover {
+  background: var(--color-brand-red-hover);
+}
+
+.errorNoticeButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.errorNoticeSecondary {
+  border: 1px solid var(--color-card-border);
+  background: var(--color-white);
+  color: var(--color-navy-primary);
+}
+
+.errorNoticeButton:focus-visible,
+.errorNoticeSecondary:focus-visible {
+  outline: 2px solid var(--color-step-active);
+  outline-offset: 3px;
+}
+
+.queryLoading {
+  color: var(--color-slate-muted);
+  font: 400 16px/24px var(--font-flow);
+  text-align: center;
+}
+
+.nameSkeleton {
+  display: inline-block;
+  width: 168px;
+  height: 0.72em;
+  margin-right: 4px;
+  border-radius: 6px;
+  background: #E5E7F2;
+  vertical-align: baseline;
+  animation: name-skeleton-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes name-skeleton-pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.errorPage {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.errorPage .errorNotice {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nameSkeleton {
+    animation: none;
+  }
+}

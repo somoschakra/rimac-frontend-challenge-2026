@@ -1,16 +1,25 @@
-import { lazy, Suspense, useDeferredValue, useEffect } from 'react'
+import { useDeferredValue, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useQuoteStore } from './store/quoteStore'
 import { useInitialQuoteForm } from './hooks/useInitialQuoteForm'
 import hero from './assets/hero.webp'
 import Header from './components/Header'
 import DocumentTypeSelect from './components/DocumentTypeSelect'
+import ViewErrorBoundary from './components/ViewErrorBoundary'
+import PlansView from './views/PlansView'
+import SummaryView from './views/SummaryView'
 import './styles/tokens.css'
 import './App.css'
 
-const PlansView = lazy(() => import('./views/PlansView'))
-const SummaryView = lazy(() => import('./views/SummaryView'))
-const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 300000, retry: 1 } } })
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 300000,
+      retry: 1,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    },
+  },
+})
 
 function Home(): React.ReactNode {
   const state = useQuoteStore()
@@ -50,14 +59,23 @@ function Home(): React.ReactNode {
 
 function AppInner(): React.ReactNode {
   const view = useQuoteStore((state) => state.view)
+  const setView = useQuoteStore((state) => state.setView)
   const deferredView = useDeferredValue(view)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [view])
 
-  if (deferredView === 'plans') return <Suspense fallback={<div className="loading" />}><PlansView /></Suspense>
-  if (deferredView === 'summary') return <Suspense fallback={<div className="loading" />}><SummaryView /></Suspense>
-  return <Home />
+  if (deferredView === 'plans') {
+    return <ViewErrorBoundary key={deferredView} onGoHome={() => setView('home')}>
+      <PlansView />
+    </ViewErrorBoundary>
+  }
+  if (deferredView === 'summary') {
+    return <ViewErrorBoundary key={deferredView} onGoHome={() => setView('home')}>
+      <SummaryView />
+    </ViewErrorBoundary>
+  }
+  return <ViewErrorBoundary key={deferredView} onGoHome={() => setView('home')}><Home /></ViewErrorBoundary>
 }
 function App(): React.ReactNode { return <QueryClientProvider client={queryClient}><AppInner /></QueryClientProvider> }
 export default App

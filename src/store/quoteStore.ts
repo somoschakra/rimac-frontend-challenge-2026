@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 export type View = 'home' | 'plans' | 'summary'
 export type DocumentType = 'DNI' | 'RUC' | 'CE' | 'Pasaporte'
@@ -26,7 +25,11 @@ interface QuoteState {
   returnToPlans: () => void
 }
 
-export const useQuoteStore = create<QuoteState>()(persist((set) => ({
+if (typeof window !== 'undefined') {
+  window.localStorage.removeItem('rimac-quote-flow')
+}
+
+export const useQuoteStore = create<QuoteState>()((set) => ({
   view: 'home', documentType: 'DNI', documentNumber: '', phone: '',
   privacy: false, commercial: false, quoteFor: null, selectedPlan: null,
   setView: (view) => set({ view }), setDocumentType: (documentType) => set({ documentType }),
@@ -35,4 +38,4 @@ export const useQuoteStore = create<QuoteState>()(persist((set) => ({
   setQuoteFor: (quoteFor) => set({ quoteFor }), setSelectedPlan: (selectedPlan) => set({ selectedPlan }),
   startQuote: () => set({ view: 'plans', quoteFor: null, selectedPlan: null }),
   returnToPlans: () => set({ view: 'plans', selectedPlan: null }),
-}), { name: 'rimac-quote-flow' }))
+}))

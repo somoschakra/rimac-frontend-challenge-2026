@@ -8,6 +8,7 @@ import addUserIcon from '../assets/icons/IcAddUserLight.png'
 import hospitalIcon from '../assets/icons/IcHospitalLight.png'
 import Header from '../components/Header'
 import BackButton from '../components/BackButton'
+import ApiErrorState from '../components/ApiErrorState'
 
 function BenefitIcon({ index }: { index: number }): React.ReactNode {
   if (index % 3 === 1) {
@@ -50,7 +51,7 @@ export default function PlansView(): React.ReactNode {
   const ageEligiblePlans = plans.filter((plan) => age <= plan.age)
   const shown = state.quoteFor === null ? [] : deferredFilter === 'recommended' ? ageEligiblePlans.filter((_, index) => index === 1) : ageEligiblePlans
   const visiblePlans = shown.length ? (shown.length === 1 ? shown : [shown[cardIndex % shown.length]]) : []
-  const name = userQuery.data ? `${userQuery.data.name} ${userQuery.data.lastName}` : 'Rocío'
+  const name = userQuery.data ? `${userQuery.data.name} ${userQuery.data.lastName}` : ''
   return <main className="flowPage">
     <Header onHome={() => state.setView('home')} />
     <nav className="stepper" aria-label="Progreso">
@@ -63,7 +64,11 @@ export default function PlansView(): React.ReactNode {
     </nav>
     <section className="plansSection">
       <BackButton onClick={() => state.setView('home')} />
-      <h1>{name} ¿Para quién deseas cotizar?</h1>
+      <h1>
+        {userQuery.data
+          ? <>{name}, ¿para quién deseas cotizar?</>
+          : <>{userQuery.isLoading && <span className="nameSkeleton" role="status" aria-label="Cargando nombre" />} ¿para quién deseas cotizar?</>}
+      </h1>
       <p className="plansSubtitle">Selecciona la opción que se ajuste más a tus necesidades.</p>
       <div className="selectionCards" role="radiogroup">
         <button className={state.quoteFor === 'me' ? 'selection active' : 'selection'} role="radio" aria-checked={state.quoteFor === 'me'} onClick={() => state.setQuoteFor('me')}>
@@ -80,7 +85,19 @@ export default function PlansView(): React.ReactNode {
       <button className="desktopFilter" type="button" onClick={() => setFilter(deferredFilter === 'all' ? 'recommended' : 'all')}>
         {deferredFilter === 'all' ? 'Mostrar recomendados' : 'Mostrar todos'}
       </button>
-      {plansQuery.isLoading && <div className="loadingCards"><div /><div /><div /></div>}
+      {userQuery.isError && <ApiErrorState
+        title={userQuery.data ? 'No pudimos actualizar tus datos' : 'No pudimos cargar tus datos'}
+        message={userQuery.data ? 'Revisa tu conexión e inténtalo nuevamente.' : 'Revisa tu conexión e inténtalo nuevamente para continuar.'}
+        onRetry={() => { void userQuery.refetch() }}
+        isRetrying={userQuery.isFetching}
+      />}
+      {state.quoteFor !== null && !userQuery.isError && plansQuery.isError && <ApiErrorState
+        title={plansQuery.data ? 'No pudimos actualizar los planes' : 'No pudimos cargar los planes'}
+        message={plansQuery.data ? 'Puedes seguir viendo la información disponible o volver a intentar.' : 'Revisa tu conexión e inténtalo nuevamente para ver las opciones.'}
+        onRetry={() => { void plansQuery.refetch() }}
+        isRetrying={plansQuery.isFetching}
+      />}
+      {state.quoteFor !== null && (userQuery.isLoading || plansQuery.isLoading) && <div className="loadingCards" role="status" aria-label="Cargando planes"><div /><div /><div /></div>}
       <div className="plansGrid desktopPlans">
         {shown.map((plan) => {
           const price = calculatePrice(plan.price, state.quoteFor === 'someone-else')
