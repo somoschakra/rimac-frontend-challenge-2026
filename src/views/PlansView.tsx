@@ -1,7 +1,9 @@
-import { memo, useDeferredValue, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getPlans, getUser } from '../api/rimacApi'
-import { calculatePrice } from '../domain/validation'
+import { calculateAge, getEligiblePlans } from '../domain/plans'
+import { quotePlan } from '../domain/pricing'
+import type { QuotedPlan } from '../domain/models'
 import { useQuoteStore } from '../store/quoteStore'
 import protectionIcon from '../assets/icons/IcProtectionLight.png'
 import addUserIcon from '../assets/icons/IcAddUserLight.png'
@@ -20,42 +22,65 @@ function BenefitIcon({ index }: { index: number }): React.ReactNode {
   return <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.5" r="2.5" /><path d="M4 17v-1.5a6 6 0 0 1 12 0V17M2 9h4m-2-2v4" /></svg>
 }
 
-const PlanCard = memo(function PlanCard({ plan, selected, onSelect }: { plan: { name: string; price: number; description: string[] }; selected: boolean; onSelect: () => void }) {
+const PlanCard = memo(function PlanCard({ plan, selected, onSelectPlan }: { plan: QuotedPlan; selected: boolean; onSelectPlan: (planName: string) => void }) {
   const icon = plan.name.includes('Clínica') ? hospitalIcon : protectionIcon
   return <article className="planCard">
     <span className="recommended">Plan recomendado</span>
     <div className="planTitleRow"><h3><b>{plan.name}</b></h3><img src={icon} width="48" height="48" alt="" /></div>
     <span className="planCost">COSTO DEL PLAN</span>
-    <b className="planPrice">$ {plan.price} al mes</b>
+    <b className="planPrice">$ {plan.quotedPrice} al mes</b>
     <hr />
     <ul>{plan.description.map((item, index) => <li key={item}>
       <span className="benefitIcon"><BenefitIcon index={index} /></span>
       <span>{item}</span>
     </li>)}</ul>
-    <button type="button" className={selected ? 'planSelected' : 'planSelect'} onClick={onSelect} aria-pressed={selected}>
+    <button type="button" className={selected ? 'planSelected' : 'planSelect'} onClick={() => onSelectPlan(plan.name)} aria-pressed={selected}>
       {selected ? 'Seleccionado' : 'Seleccionar plan'}
     </button>
   </article>
 })
 
 export default function PlansView(): React.ReactNode {
-  const state = useQuoteStore()
+  const quoteFor = useQuoteStore((state) => state.quoteFor)
+  const selectedPlan = useQuoteStore((state) => state.selectedPlan)
+  const setQuoteFor = useQuoteStore((state) => state.setQuoteFor)
+  const setSelectedPlan = useQuoteStore((state) => state.setSelectedPlan)
+  const setView = useQuoteStore((state) => state.setView)
   const [filter, setFilter] = useState<'all' | 'recommended'>('all')
   const deferredFilter = useDeferredValue(filter)
   const [cardIndex, setCardIndex] = useState(0)
-  const userQuery = useQuery({ queryKey: ['user'], queryFn: getUser })
-  const plansQuery = useQuery({ queryKey: ['plans'], queryFn: getPlans, enabled: userQuery.isSuccess })
-  const plans = plansQuery.data ?? []
+  const userQuery = useQuery({ queryKey: ['user'], queryFn: ({ signal }) => getUser(signal) })
+  const plansQuery = useQuery({ queryKey: ['plans'], queryFn: ({ signal }) => getPlans(signal), enabled: userQuery.isSuccess })
   const userBirthDay = userQuery.data?.birthDay
-  const age = userBirthDay ? (() => { const [day, month, year] = userBirthDay.split('-').map(Number); const today = new Date(); let result = today.getFullYear() - year; const monthDelta = today.getMonth() + 1 - month; if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < day)) result -= 1; return result })() : 0
-  const ageEligiblePlans = plans.filter((plan) => age <= plan.age)
-  const shown = state.quoteFor === null ? [] : deferredFilter === 'recommended' ? ageEligiblePlans.filter((_, index) => index === 1) : ageEligiblePlans
-  const visiblePlans = shown.length ? (shown.length === 1 ? shown : [shown[cardIndex % shown.length]]) : []
+  const age = userBirthDay ? calculateAge(userBirthDay) : null
+  const ageEligiblePlans = useMemo(
+    () => age === null ? [] : getEligiblePlans(plansQuery.data ?? [], age),
+    [age, plansQuery.data],
+  )
+  const shown = useMemo(
+    () => quoteFor === null
+      ? []
+      : deferredFilter === 'recommended'
+        ? ageEligiblePlans.filter((_, index) => index === 1)
+        : ageEligiblePlans,
+    [ageEligiblePlans, deferredFilter, quoteFor],
+  )
+  const quotedPlans = useMemo(
+    () => shown.map((plan) => quotePlan(plan, quoteFor === 'someone-else' ? 'someone-else' : 'me')),
+    [quoteFor, shown],
+  )
+  const handlePlanSelect = useCallback((planName: string): void => {
+    setSelectedPlan(planName)
+    setView('summary')
+  }, [setSelectedPlan, setView])
+  const visiblePlan = quotedPlans.length
+    ? quotedPlans[shown.length === 1 ? 0 : cardIndex % shown.length]
+    : undefined
   const name = userQuery.data ? `${userQuery.data.name} ${userQuery.data.lastName}` : ''
   return <main className="flowPage">
-    <Header onHome={() => state.setView('home')} />
+    <Header onHome={() => setView('home')} />
     <nav className="stepper" aria-label="Progreso">
-      <BackButton variant="mobile" onClick={() => state.setView('home')} />
+      <BackButton variant="mobile" onClick={() => setView('home')} />
       <span className="mobileStepLabel">PASO 1 DE 2</span>
       <div className="mobileProgressBar" aria-hidden="true"><span /></div>
       <div className="stepProgress">
@@ -63,7 +88,7 @@ export default function PlansView(): React.ReactNode {
       </div>
     </nav>
     <section className="plansSection">
-      <BackButton onClick={() => state.setView('home')} />
+      <BackButton onClick={() => setView('home')} />
       <h1>
         {userQuery.data
           ? <>{name}, ¿para quién deseas cotizar?</>
@@ -71,12 +96,12 @@ export default function PlansView(): React.ReactNode {
       </h1>
       <p className="plansSubtitle">Selecciona la opción que se ajuste más a tus necesidades.</p>
       <div className="selectionCards" role="radiogroup">
-        <button className={state.quoteFor === 'me' ? 'selection active' : 'selection'} role="radio" aria-checked={state.quoteFor === 'me'} onClick={() => state.setQuoteFor('me')}>
+        <button className={quoteFor === 'me' ? 'selection active' : 'selection'} role="radio" aria-checked={quoteFor === 'me'} onClick={() => setQuoteFor('me')}>
           <img src={protectionIcon} width="56" height="56" alt="" />
           <div><b>Para mí</b><span>Cotiza tu seguro de salud y agrega familiares si así lo deseas.</span></div>
           <span className="radioMark" />
         </button>
-        <button className={state.quoteFor === 'someone-else' ? 'selection active' : 'selection'} role="radio" aria-checked={state.quoteFor === 'someone-else'} onClick={() => state.setQuoteFor('someone-else')}>
+        <button className={quoteFor === 'someone-else' ? 'selection active' : 'selection'} role="radio" aria-checked={quoteFor === 'someone-else'} onClick={() => setQuoteFor('someone-else')}>
           <img src={addUserIcon} width="56" height="56" alt="" />
           <div><b>Para alguien más</b><span>Realiza una cotización para uno de tus familiares o cualquier persona.</span></div>
           <span className="radioMark" />
@@ -91,25 +116,19 @@ export default function PlansView(): React.ReactNode {
         onRetry={() => { void userQuery.refetch() }}
         isRetrying={userQuery.isFetching}
       />}
-      {state.quoteFor !== null && !userQuery.isError && plansQuery.isError && <ApiErrorState
+      {quoteFor !== null && !userQuery.isError && plansQuery.isError && <ApiErrorState
         title={plansQuery.data ? 'No pudimos actualizar los planes' : 'No pudimos cargar los planes'}
         message={plansQuery.data ? 'Puedes seguir viendo la información disponible o volver a intentar.' : 'Revisa tu conexión e inténtalo nuevamente para ver las opciones.'}
         onRetry={() => { void plansQuery.refetch() }}
         isRetrying={plansQuery.isFetching}
       />}
-      {state.quoteFor !== null && (userQuery.isLoading || plansQuery.isLoading) && <div className="loadingCards" role="status" aria-label="Cargando planes"><div /><div /><div /></div>}
+      {quoteFor !== null && (userQuery.isLoading || plansQuery.isLoading) && <div className="loadingCards" role="status" aria-label="Cargando planes"><div /><div /><div /></div>}
       <div className="plansGrid desktopPlans">
-        {shown.map((plan) => {
-          const price = calculatePrice(plan.price, state.quoteFor === 'someone-else')
-          return <PlanCard key={plan.name} plan={{ ...plan, price }} selected={state.selectedPlan === plan.name} onSelect={() => { state.setSelectedPlan(plan.name); state.setView('summary') }} />
-        })}
+        {quotedPlans.map((plan) => <PlanCard key={plan.name} plan={plan} selected={selectedPlan === plan.name} onSelectPlan={handlePlanSelect} />)}
       </div>
       <div className="mobilePlans">
         <div className="mobilePlanList">
-          {visiblePlans.map((plan) => {
-            const price = calculatePrice(plan.price, state.quoteFor === 'someone-else')
-            return <PlanCard key={plan.name} plan={{ ...plan, price }} selected={state.selectedPlan === plan.name} onSelect={() => { state.setSelectedPlan(plan.name); state.setView('summary') }} />
-          })}
+          {visiblePlan && <PlanCard key={visiblePlan.name} plan={visiblePlan} selected={selectedPlan === visiblePlan.name} onSelectPlan={handlePlanSelect} />}
         </div>
         {shown.length > 0 && <nav className="planPager" aria-label="Carrusel de planes">
           <button type="button" aria-label="Plan anterior" onClick={() => setCardIndex((cardIndex - 1 + shown.length) % shown.length)}>

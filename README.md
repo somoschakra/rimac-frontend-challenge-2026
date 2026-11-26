@@ -38,18 +38,20 @@ Ejecuta la suite con:
 npm test
 ```
 
-Las pruebas de `src/domain/validation.test.ts` cubren:
+Las pruebas unitarias en `src/domain/` y `src/adapters/` cubren:
 
 - Documentos: DNI de 8 dígitos y otros tipos de 8 a 10 caracteres alfanuméricos.
 - Celular: exactamente 9 dígitos e inicio con 9.
 - Formulario: todos los campos y ambos consentimientos son obligatorios.
 - Precio: descuento del 5 % únicamente al cotizar para otra persona.
+- Edad: cálculo antes/después del cumpleaños y filtro de planes por edad máxima.
+- Adaptadores: mapeo de datos válidos y rechazo de respuestas API incompletas o mal formadas.
 
 Resultado esperado:
 
 ```text
-Test Files  1 passed (1)
-Tests       12 passed (12)
+Test Files  4 passed (4)
+Tests       23 passed (23)
 ```
 
 ## Flujo de cotización
@@ -67,11 +69,14 @@ src/
 ├── adapters/     Normalización de datos externos
 ├── api/          Solicitudes al servicio de cotización
 ├── components/   Header, selector de documento y botones compartidos
-├── domain/       Validaciones y reglas de precio
+├── domain/       Modelos, validaciones, edad, elegibilidad y precios
+├── hooks/        Estado de interacción y validación del formulario
 ├── store/        Estado en memoria del flujo
 ├── styles/       Tokens globales de diseño
 └── views/        Pantallas de planes y resumen
 ```
+
+`App.css` contiene actualmente los estilos responsive globales. Las respuestas externas se validan y adaptan antes de entrar al caché de TanStack Query. El proyecto compila con `strict: true`.
 
 ## Servicio de datos
 

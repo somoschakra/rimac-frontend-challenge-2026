@@ -1,7 +1,60 @@
-import type { RawUser, RawPlan } from '../api/rimacApi'
+import { calculateAge } from '../domain/plans'
+import type { InsurancePlan, User } from '../domain/models'
 
-export interface User { name: string; lastName: string; birthDay: string }
-export interface InsurancePlan { name: string; price: number; description: string[]; age: number }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
-export const adaptUser = (raw: RawUser): User => ({ name: raw.name, lastName: raw.lastName, birthDay: raw.birthDay })
-export const adaptPlans = (raw: RawPlan[]): InsurancePlan[] => raw.map((plan) => ({ name: plan.name, price: plan.price, description: plan.description, age: plan.age }))
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item: unknown) => typeof item === 'string')
+}
+
+export function adaptUser(payload: unknown): User {
+  if (
+    !isRecord(payload) ||
+    typeof payload.name !== 'string' ||
+    typeof payload.lastName !== 'string' ||
+    typeof payload.birthDay !== 'string' ||
+    !payload.name.trim() ||
+    !payload.lastName.trim() ||
+    calculateAge(payload.birthDay) === null
+  ) {
+    throw new Error('La respuesta del servicio de usuario no tiene un formato válido')
+  }
+
+  return {
+    name: payload.name,
+    lastName: payload.lastName,
+    birthDay: payload.birthDay,
+  }
+}
+
+export function adaptPlans(payload: unknown): InsurancePlan[] {
+  if (!isRecord(payload) || !Array.isArray(payload.list)) {
+    throw new Error('La respuesta del servicio de planes no tiene un formato válido')
+  }
+
+  return payload.list.map((item, index) => {
+    if (
+      !isRecord(item) ||
+      typeof item.name !== 'string' ||
+      !item.name.trim() ||
+      typeof item.price !== 'number' ||
+      !Number.isFinite(item.price) ||
+      item.price < 0 ||
+      !isStringArray(item.description) ||
+      typeof item.age !== 'number' ||
+      !Number.isFinite(item.age) ||
+      item.age < 0
+    ) {
+      throw new Error(`El plan ${index + 1} recibido del servicio no tiene un formato válido`)
+    }
+
+    return {
+      name: item.name,
+      price: item.price,
+      description: item.description,
+      age: item.age,
+    }
+  })
+}

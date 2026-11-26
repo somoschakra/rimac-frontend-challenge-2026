@@ -46,5 +46,3 @@ export const validateInitialQuote = ({
   privacy: privacy ? undefined : 'Debes aceptar la Política de Privacidad',
   commercial: commercial ? undefined : 'Debes aceptar la Política de Comunicaciones Comerciales',
 })
-
-export const calculatePrice = (cost: number, forSomeoneElse: boolean): number => forSomeoneElse ? cost * 0.95 : cost

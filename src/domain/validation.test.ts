@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DocumentType } from '../store/quoteStore'
-import { calculatePrice, documentValidators, validateInitialQuote, validatePhone } from './validation'
+import { documentValidators, validateInitialQuote, validatePhone } from './validation'
 
 describe('document validation', () => {
   it.each([
@@ -62,12 +62,5 @@ describe('initial quote validation', () => {
 
   it('returns no errors when all fields are valid', () => {
     expect(Object.values(validateInitialQuote(validForm)).every((error) => !error)).toBe(true)
-  })
-})
-
-describe('plan pricing', () => {
-  it('applies a five percent discount only when quoting for someone else', () => {
-    expect(calculatePrice(100, false)).toBe(100)
-    expect(calculatePrice(100, true)).toBe(95)
   })
 })

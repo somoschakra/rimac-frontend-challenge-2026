@@ -22,7 +22,16 @@ const queryClient = new QueryClient({
 })
 
 function Home(): React.ReactNode {
-  const state = useQuoteStore()
+  const documentType = useQuoteStore((state) => state.documentType)
+  const documentNumber = useQuoteStore((state) => state.documentNumber)
+  const phone = useQuoteStore((state) => state.phone)
+  const privacy = useQuoteStore((state) => state.privacy)
+  const commercial = useQuoteStore((state) => state.commercial)
+  const setDocumentType = useQuoteStore((state) => state.setDocumentType)
+  const setDocumentNumber = useQuoteStore((state) => state.setDocumentNumber)
+  const setPhone = useQuoteStore((state) => state.setPhone)
+  const setPrivacy = useQuoteStore((state) => state.setPrivacy)
+  const setCommercial = useQuoteStore((state) => state.setCommercial)
   const { getError, touch, handleSubmit } = useInitialQuoteForm()
   const documentError = getError('documentNumber')
   const phoneError = getError('phone')
@@ -36,19 +45,19 @@ function Home(): React.ReactNode {
         <div className="fieldGroup documentGroup">
           <label className="fieldHeading" htmlFor="documentNumber">Documento</label>
           <div className="documentRow">
-            <DocumentTypeSelect value={state.documentType} onChange={state.setDocumentType} />
-            <label className="floating"><input id="documentNumber" value={state.documentNumber} inputMode={state.documentType === 'DNI' ? 'numeric' : 'text'} maxLength={state.documentType === 'DNI' ? 8 : 10} required aria-invalid={Boolean(documentError)} aria-describedby={documentError ? 'documentNumber-error' : undefined} onBlur={() => touch('documentNumber')} onChange={(e) => state.setDocumentNumber(e.target.value)} /></label>
+            <DocumentTypeSelect value={documentType} onChange={setDocumentType} />
+            <label className="floating"><input id="documentNumber" value={documentNumber} inputMode={documentType === 'DNI' ? 'numeric' : 'text'} maxLength={documentType === 'DNI' ? 8 : 10} required aria-invalid={Boolean(documentError)} aria-describedby={documentError ? 'documentNumber-error' : undefined} onBlur={() => touch('documentNumber')} onChange={(e) => setDocumentNumber(e.target.value)} /></label>
           </div>
         </div>
         {documentError && <p id="documentNumber-error" className="error" role="alert">{documentError}</p>}
         <div className="fieldGroup phoneGroup">
           <label className="fieldHeading" htmlFor="phone">Celular</label>
-          <label className="floating phoneInput"><input id="phone" value={state.phone} inputMode="numeric" maxLength={9} required aria-invalid={Boolean(phoneError)} aria-describedby={phoneError ? 'phone-error' : undefined} onBlur={() => touch('phone')} onChange={(e) => state.setPhone(e.target.value)} /></label>
+          <label className="floating phoneInput"><input id="phone" value={phone} inputMode="numeric" maxLength={9} required aria-invalid={Boolean(phoneError)} aria-describedby={phoneError ? 'phone-error' : undefined} onBlur={() => touch('phone')} onChange={(e) => setPhone(e.target.value)} /></label>
         </div>
         {phoneError && <p id="phone-error" className="error" role="alert">{phoneError}</p>}
-        <div className="check"><input id="privacyPolicy" name="policy" type="checkbox" checked={state.privacy} required aria-invalid={Boolean(privacyError)} aria-describedby={privacyError ? 'privacyPolicy-error' : undefined} onBlur={() => touch('privacy')} onChange={(e) => state.setPrivacy(e.target.checked)} /><label htmlFor="privacyPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política de Privacidad</span></label></div>
+        <div className="check"><input id="privacyPolicy" name="policy" type="checkbox" checked={privacy} required aria-invalid={Boolean(privacyError)} aria-describedby={privacyError ? 'privacyPolicy-error' : undefined} onBlur={() => touch('privacy')} onChange={(e) => setPrivacy(e.target.checked)} /><label htmlFor="privacyPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política de Privacidad</span></label></div>
         {privacyError && <p id="privacyPolicy-error" className="error" role="alert">{privacyError}</p>}
-        <div className="check"><input id="commercialPolicy" name="commercialPolicy" type="checkbox" checked={state.commercial} required aria-invalid={Boolean(commercialError)} aria-describedby={commercialError ? 'commercialPolicy-error' : undefined} onBlur={() => touch('commercial')} onChange={(e) => state.setCommercial(e.target.checked)} /><label htmlFor="commercialPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política Comunicaciones Comerciales</span></label></div>
+        <div className="check"><input id="commercialPolicy" name="commercialPolicy" type="checkbox" checked={commercial} required aria-invalid={Boolean(commercialError)} aria-describedby={commercialError ? 'commercialPolicy-error' : undefined} onBlur={() => touch('commercial')} onChange={(e) => setCommercial(e.target.checked)} /><label htmlFor="commercialPolicy"><span className="checkBox"><svg width="12" height="10" viewBox="0 0 12 10" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 1" /></svg></span><span>Acepto la Política Comunicaciones Comerciales</span></label></div>
         {commercialError && <p id="commercialPolicy-error" className="error" role="alert">{commercialError}</p>}
         <a className="terms" href="#"><b>Aplican Términos y Condiciones.</b></a><button className="primary" type="submit">Cotiza aquí</button>
       </form>

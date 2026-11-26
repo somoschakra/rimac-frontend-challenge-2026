@@ -1,8 +1,9 @@
 import { create } from 'zustand'
+import type { QuoteTarget } from '../domain/pricing'
 
 export type View = 'home' | 'plans' | 'summary'
 export type DocumentType = 'DNI' | 'RUC' | 'CE' | 'Pasaporte'
-export type QuoteFor = 'me' | 'someone-else' | null
+export type QuoteFor = QuoteTarget | null
 
 interface QuoteState {
   view: View
