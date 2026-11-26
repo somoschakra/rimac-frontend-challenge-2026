@@ -1,13 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { documentValidators, validatePhone } from '../domain/validation'
+import { validateInitialQuote, type InitialQuoteField } from '../domain/validation'
 import { useQuoteStore } from '../store/quoteStore'
 
-type FormField = 'documentNumber' | 'phone' | 'privacy' | 'commercial'
-type FormErrors = Partial<Record<FormField, string>>
-
 export function useInitialQuoteForm(): {
-  getError: (field: FormField) => string | undefined
-  touch: (field: FormField) => void
+  getError: (field: InitialQuoteField) => string | undefined
+  touch: (field: InitialQuoteField) => void
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void
 } {
   const documentType = useQuoteStore((state) => state.documentType)
@@ -16,20 +13,15 @@ export function useInitialQuoteForm(): {
   const privacy = useQuoteStore((state) => state.privacy)
   const commercial = useQuoteStore((state) => state.commercial)
   const startQuote = useQuoteStore((state) => state.startQuote)
-  const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({})
+  const [touched, setTouched] = useState<Partial<Record<InitialQuoteField, boolean>>>({})
   const [submitted, setSubmitted] = useState(false)
 
-  const errors: FormErrors = {
-    documentNumber: documentValidators[documentType].validate(documentNumber) ?? undefined,
-    phone: validatePhone(phone) ?? undefined,
-    privacy: privacy ? undefined : 'Debes aceptar la Política de Privacidad',
-    commercial: commercial ? undefined : 'Debes aceptar la Política de Comunicaciones Comerciales',
-  }
+  const errors = validateInitialQuote({ documentType, documentNumber, phone, privacy, commercial })
 
-  const getError = (field: FormField): string | undefined =>
+  const getError = (field: InitialQuoteField): string | undefined =>
     (submitted || touched[field]) ? errors[field] : undefined
 
-  const touch = (field: FormField): void => {
+  const touch = (field: InitialQuoteField): void => {
     setTouched((current) => ({ ...current, [field]: true }))
   }
 
